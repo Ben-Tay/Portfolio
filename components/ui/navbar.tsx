@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils"
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
   { href: "/#resume", label: "Resume" },
   { href: "/#projects", label: "Projects" },
 ]
@@ -16,6 +15,7 @@ const navLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrollSection, setScrollSection] = useState("/")
+  const hashLockRef = useRef<string | null>(null)
   const pathname = usePathname()
   const isHome = pathname === "/"
   const activeSection = isHome ? scrollSection : pathname
@@ -24,6 +24,7 @@ export function Navbar() {
     if (!isHome) return
 
     const update = () => {
+      if (hashLockRef.current) return
       const resume = document.getElementById("resume")
       const projects = document.getElementById("projects")
       const resumeTop = resume?.offsetTop ?? Infinity
@@ -35,12 +36,44 @@ export function Navbar() {
       else setScrollSection("/")
     }
 
+    const scrollToHash = (hash: string) => {
+      hashLockRef.current = hash
+      setScrollSection(hash)
+      const id = hash.replace("#", "")
+      let attempts = 0
+      const timer = window.setInterval(() => {
+        const el = document.getElementById(id)
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" })
+        }
+        if (++attempts > 20) {
+          window.clearInterval(timer)
+          hashLockRef.current = null
+          update()
+        }
+      }, 250)
+    }
+
     update()
+    const hash = window.location.hash
+    if (hash === "#resume" || hash === "#projects") {
+      scrollToHash(hash)
+    }
+
+    const handleHashChange = () => {
+      const next = window.location.hash
+      if (next === "#resume" || next === "#projects") {
+        scrollToHash(next)
+      }
+    }
+
     window.addEventListener("scroll", update, { passive: true })
     window.addEventListener("resize", update)
+    window.addEventListener("hashchange", handleHashChange)
     return () => {
       window.removeEventListener("scroll", update)
       window.removeEventListener("resize", update)
+      window.removeEventListener("hashchange", handleHashChange)
     }
   }, [isHome, pathname])
 

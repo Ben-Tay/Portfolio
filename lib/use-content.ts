@@ -52,32 +52,34 @@ export function useContent() {
 
   useEffect(() => {
     let cancelled = false
-    let supabase: ReturnType<typeof getSupabase>
-    try {
-      supabase = getSupabase()
-    } catch {
-      setLoading(false)
-      return
-    }
-    supabase
-      .from("content")
-      .select("key, value")
-      .then(({ data: rows, error }) => {
-        if (cancelled) return
-        if (error) {
-          setData(null)
-          setLoading(false)
-          return
-        }
-        const result: Record<string, unknown> = {}
-        for (const row of rows ?? []) {
-          result[row.key] = row.value
-        }
-        const normalized = { ...result }
-        normalized.projects = normalizeProjects(normalized.projects as ContentData["projects"])
-        setData(normalized as ContentData)
+    const run = async () => {
+      let query: Promise<{ data: Array<{ key: string; value: unknown }> | null; error: unknown }> | null = null
+      try {
+        query = getSupabase().from("content").select("key, value") as unknown as Promise<{
+          data: Array<{ key: string; value: unknown }> | null
+          error: unknown
+        }>
+      } catch {
+        // Supabase not configured — leave loading state as is
+      }
+      if (!query) return
+      const { data: rows, error } = await query
+      if (cancelled) return
+      if (error) {
+        setData(null)
         setLoading(false)
-      })
+        return
+      }
+      const result: Record<string, unknown> = {}
+      for (const row of rows ?? []) {
+        result[row.key] = row.value
+      }
+      const normalized = { ...result }
+      normalized.projects = normalizeProjects(normalized.projects as ContentData["projects"])
+      setData(normalized as ContentData)
+      setLoading(false)
+    }
+    run()
     return () => {
       cancelled = true
     }

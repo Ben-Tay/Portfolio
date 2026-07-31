@@ -99,3 +99,44 @@
     scroll-margin-top: 5rem;
   }
 }
+
+@media print {
+  header,
+  footer,
+  .fixed,
+  button {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  body,
+  .bg-card,
+  .bg-background,
+  .bg-muted,
+  .bg-primary\/5 {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .text-card-foreground,
+  .text-foreground,
+  .text-muted-foreground,
+  .text-primary,
+  .text-accent-foreground {
+    color: #000 !important;
+  }
+  .border,
+  .border-border {
+    border-color: #ccc !important;
+  }
+  [style*="opacity:0"],
+  [style*="opacity: 0"] {
+    opacity: 1 !important;
+  }
+  [style*="transform:"] {
+    transform: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

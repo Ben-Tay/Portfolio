@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Briefcase, Check, Download, Pencil, X, Plus, Trash2 } from "lucide-react"
+import { Briefcase, Check, Pencil, X, Plus, Trash2 } from "lucide-react"
 import { ScrollAnimation, StaggerContainer, StaggerItem } from "@/components/ui/scroll-animation"
+import { DownloadResumeButton } from "@/components/ui/download-resume-button"
 import { useAdmin } from "@/lib/admin-context"
 
 interface ExperienceEntry {
@@ -146,9 +147,7 @@ export function ResumeSectionInner({ experience, onSave }: ResumeSectionInnerPro
                   </button>
                 </>
               )}
-              <a href="#" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-card-foreground transition-colors hover:bg-accent">
-                <Download className="size-3.5" />PDF
-              </a>
+              <DownloadResumeButton className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-card-foreground transition-colors hover:bg-accent" />
             </div>
           </div>
         </ScrollAnimation>

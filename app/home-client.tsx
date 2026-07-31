@@ -6,7 +6,6 @@ import { HighlightsSectionInner } from "@/components/ui/highlights-section"
 import { EducationSectionInner } from "@/components/ui/education-section"
 import { ResumeSectionInner } from "@/components/ui/resume-section"
 import { ProjectsSectionInner } from "@/components/ui/projects-section"
-import { AboutSections } from "@/components/ui/about-sections"
 
 const emptyContent: ContentData = {
   about: { bio: [], roles: [], passions: [], hobbies: [] },
@@ -26,7 +25,6 @@ export function HomeClient() {
         <p className="mt-1 text-sm text-gray-600">{content.about?.roles?.join(" · ")}</p>
       </div>
       <HeroSection about={content.about} />
-      <AboutSections about={content.about} onSave={(v) => saveContent("about", v)} />
       <HighlightsSectionInner
         strengths={content.strengths || emptyContent.strengths!}
         projects={content.projects}

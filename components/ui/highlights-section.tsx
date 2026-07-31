@@ -76,7 +76,7 @@ export function HighlightsSectionInner({ strengths, projects, onSave }: Highligh
   const list = editing ? draft : strengths
 
   return (
-    <section className="border-b border-border py-16 sm:py-20">
+    <section className="border-b border-border py-16 sm:py-20 print:hidden">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-2">
           <ScrollAnimation direction="left">

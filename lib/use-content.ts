@@ -52,7 +52,14 @@ export function useContent() {
 
   useEffect(() => {
     let cancelled = false
-    getSupabase()
+    let supabase: ReturnType<typeof getSupabase>
+    try {
+      supabase = getSupabase()
+    } catch {
+      setLoading(false)
+      return
+    }
+    supabase
       .from("content")
       .select("key, value")
       .then(({ data: rows, error }) => {
@@ -79,7 +86,13 @@ export function useContent() {
   const saveContent = useCallback(
     async (key: string, value: unknown) => {
       if (!isAdmin) return
-      const { error } = await getSupabase()
+      let supabase: ReturnType<typeof getSupabase>
+      try {
+        supabase = getSupabase()
+      } catch {
+        return
+      }
+      const { error } = await supabase
         .from("content")
         .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" })
       if (!error) {

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, Download } from "lucide-react"
+import { ArrowRight, Download, Pencil, Check, X, Plus, Trash2 } from "lucide-react"
 import { motion } from "framer-motion"
+import { useAdmin } from "@/lib/admin-context"
 
 interface HeroAbout {
   bio?: string[]
@@ -32,7 +33,8 @@ function LinkedInIcon() {
   )
 }
 
-export function HeroSection({ about }: { about?: HeroAbout }) {
+export function HeroSection({ about, onSaveBio }: { about?: HeroAbout; onSaveBio?: (bio: string[]) => void }) {
+  const { isAdmin } = useAdmin()
   const bio = about?.bio ?? []
   const roles = about?.roles?.filter((r) => r.trim()) ?? []
   const hobbies = about?.hobbies ?? []
@@ -40,6 +42,37 @@ export function HeroSection({ about }: { about?: HeroAbout }) {
   const [role, setRole] = useState("")
   const [roleIndex, setRoleIndex] = useState(0)
   const [deleting, setDeleting] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState<string[]>([])
+
+  const enterEdit = () => {
+    setDraft([...bio])
+    setEditing(true)
+  }
+
+  const saveEdit = () => {
+    onSaveBio?.(draft)
+    setEditing(false)
+  }
+
+  const cancelEdit = () => {
+    setDraft([...bio])
+    setEditing(false)
+  }
+
+  const updateDraft = (i: number, value: string) => {
+    const d = [...draft]
+    d[i] = value
+    setDraft(d)
+  }
+
+  const addParagraph = () => {
+    setDraft((d) => [...d, ""])
+  }
+
+  const removeParagraph = (i: number) => {
+    setDraft((d) => d.filter((_, idx) => idx !== i))
+  }
 
   useEffect(() => {
     const full = ROLES[roleIndex]
@@ -110,17 +143,72 @@ export function HeroSection({ about }: { about?: HeroAbout }) {
             <span className="ml-0.5 inline-block w-[2px] animate-pulse bg-primary align-middle" style={{ height: "1em" }} />
           </motion.p>
 
-          {bio.map((paragraph, i) => (
-            <motion.p
-              key={i}
-              initial={fadeUp}
-              animate={visible}
-              transition={{ duration: 0.6, delay: 0.25 + i * 0.1 }}
-              className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/80 sm:text-lg"
-            >
-              {paragraph}
-            </motion.p>
-          ))}
+          {onSaveBio && isAdmin && (
+            <div className="mt-5 flex w-full items-center justify-end">
+              {!editing ? (
+                <button
+                  onClick={enterEdit}
+                  className="inline-flex h-7 items-center gap-1.5 rounded-md border border-primary/40 bg-card px-2.5 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Pencil className="size-3" />Edit All
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={saveEdit}
+                    className="inline-flex h-7 items-center gap-1.5 rounded-md bg-primary px-2.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    <Check className="size-3" />Save
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="ml-2 inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-medium text-card-foreground transition-colors hover:bg-muted"
+                  >
+                    <X className="size-3" />Cancel
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {editing && onSaveBio ? (
+            <div className="mt-5 w-full space-y-3">
+              {draft.map((paragraph, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <textarea
+                    value={draft[i]}
+                    onChange={(e) => updateDraft(i, e.target.value)}
+                    rows={2}
+                    className="w-full rounded border border-primary/40 bg-background px-2 py-1 text-sm text-foreground outline-none"
+                  />
+                  <button
+                    onClick={() => removeParagraph(i)}
+                    className="mt-1 text-muted-foreground transition-colors hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={addParagraph}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary"
+              >
+                <Plus className="size-3.5" />Add paragraph
+              </button>
+            </div>
+          ) : (
+            bio.map((paragraph, i) => (
+              <motion.p
+                key={i}
+                initial={fadeUp}
+                animate={visible}
+                transition={{ duration: 0.6, delay: 0.25 + i * 0.1 }}
+                className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/80 sm:text-lg"
+              >
+                {paragraph}
+              </motion.p>
+            ))
+          )}
 
           <motion.div
             initial={fadeUp}

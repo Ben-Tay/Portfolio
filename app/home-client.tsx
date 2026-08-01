@@ -24,7 +24,10 @@ export function HomeClient() {
         <h1 className="text-3xl font-bold tracking-tight text-black">Benedict Tay</h1>
         <p className="mt-1 text-sm text-gray-600">{content.about?.roles?.join(" · ")}</p>
       </div>
-      <HeroSection about={content.about} />
+      <HeroSection
+        about={content.about}
+        onSaveBio={(bio) => saveContent("about", { ...content.about, bio })}
+      />
       <HighlightsSectionInner
         strengths={content.strengths || emptyContent.strengths!}
         projects={content.projects}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, ReactNode, useCallback } from "react"
+import { useState, useRef, useEffect, ReactNode, useCallback, Fragment } from "react"
 import { Pencil, Check, X } from "lucide-react"
 import { useAdmin } from "@/lib/admin-context"
 
@@ -104,7 +104,13 @@ export function EditableArray({ value, onSave, renderItem, className }: Editable
   }, [value, onSave])
 
   if (!isAdmin) {
-    return <div className={className}>{value.map((item, i) => renderItem(item, i))}</div>
+    return (
+      <div className={className}>
+        {value.map((item, i) => (
+          <Fragment key={i}>{renderItem(item, i)}</Fragment>
+        ))}
+      </div>
+    )
   }
 
   return (
